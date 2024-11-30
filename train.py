@@ -34,9 +34,10 @@ class TrainingLoop:
     loss_fn = nn.CrossEntropyLoss(ignore_index=tokenizer_src.token_to_id('[PAD]'), label_soothing=0.1).to(device)
     
     for epoch in range(initial_epoch, config['num_epoch']):
-      model.train()
       batch_iterator = tqdm(train_dataloader, desc=f'Processing epoch {epoch:02d}')
       for batch in batch_iterator:
+        model.train()
+        
         encoder_input = batch['encoder_input'].to(device) # (B, seq_len)
         decoder_input = batch['decoder_input'].to(device) # (B, seq_len)
         encoder_mask = batch['encoder_mask'].to(device) # (B, 1, 1, seq_len)
@@ -66,6 +67,8 @@ class TrainingLoop:
         
         global_step += 1
         
+      run_validation(model, val_dataloader, tokenizer_src, tokenizer_tgt, config['seq_len'], device, lambda msg: batch_iterator.write(msg), global_step, writer)
+      
       # Save the model at the end of every epoch
       model_filename = get_weights_file_path(config, f'{epoch:02d}')
       torch.save({
