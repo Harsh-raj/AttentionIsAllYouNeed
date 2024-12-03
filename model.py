@@ -11,11 +11,11 @@ class MultiHeadAttentionBlock(nn.Module):
     assert d_model % h == 0, "d_model is not divisible by h"
     
     self.d_k = d_model // h
-    self.w_q = nn.Linear(d_model, d_model) #wq
-    self.w_k = nn.Linear(d_model, d_model) #wk
-    self.w_v = nn.Linear(d_model, d_model) #wv
+    self.w_q = nn.Linear(d_model, d_model, bias=False) #wq
+    self.w_k = nn.Linear(d_model, d_model, bias=False) #wk
+    self.w_v = nn.Linear(d_model, d_model, bias=False) #wv
     
-    self.w_o = nn.Linear(d_model, d_model) #wo
+    self.w_o = nn.Linear(d_model, d_model, bias=False) #wo
     self.dropout = nn.Dropout(dropout)
   
   @staticmethod
