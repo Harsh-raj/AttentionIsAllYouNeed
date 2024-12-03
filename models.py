@@ -2,10 +2,10 @@ import torch
 import torch.nn as nn
 
 class Encoder(nn.module):
-  def __init__(self, layers: nn.ModuleList) -> None:
+  def __init__(self, features: int, layers: nn.ModuleList) -> None:
     super().__init__()
     self.layers = layers
-    self.norm = LayerNormalization()
+    self.norm = LayerNormalization(features)
     
   def forward(self, x, mask):
     for layer in self.layers:
