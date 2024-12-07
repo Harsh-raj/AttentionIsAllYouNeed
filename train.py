@@ -1,4 +1,4 @@
-from models import BuildTransformer
+from model import BuildTransformer
 from dataset import BilingualDataset
 from config import Config#get_config, get_weights_file_path, latest_weights_file_path
 

@@ -11,7 +11,7 @@ class Config:
         "d_model": 512,
         "datasource": 'opus_books',
         "lang_src": "en",
-        "lang_tgt": "es",
+        "lang_tgt": "it",
         "model_folder": "weights",
         "model_basename": "tmodel_",
         "preload": "latest",
