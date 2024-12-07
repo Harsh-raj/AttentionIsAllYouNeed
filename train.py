@@ -1,4 +1,7 @@
-class TrainingLoop:
+import os
+import torch
+
+class Train:
   
   def greedy_decode(model, source, source_mask, tokenizer_src, tokenizer_tgt, max_len, device):
     sos_idx = tokenizer_tgt.token_to_id('[SOS]')
@@ -38,11 +41,17 @@ class TrainingLoop:
     expected = []
     predicted = []
     
-    # size of the control window (just use a default value)
-    console_width = 80
+    try:
+        # get the console window width
+        with os.popen('stty size', 'r') as console:
+            _, console_width = console.read().split()
+            console_width = int(console_width)
+    except:
+        # If we can't get the console width, use 80 as default
+        console_width = 80
     
     with torch.no_grad():
-      for batch in validation ds:
+      for batch in validation_ds:
         count += 1
         encoder_input = batch['encoder_input'].to(device)
         encoder_mask = batch['encoder_mask'].to(device)
@@ -55,9 +64,9 @@ class TrainingLoop:
         target_text = batch['tgt_text'][0]
         model_out_text = tokenizer_tgt.decode(model_out.detach().cpu().numpy())
         
-        # source_texts.append(source_text)
-        # expected.append(target_text)
-        # predicted.append(model_out_text)
+        source_texts.append(source_text)
+        expected.append(target_text)
+        predicted.append(model_out_text)
         
         #print to the console
         print_msg('-'*console_width)
