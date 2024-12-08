@@ -222,14 +222,26 @@ class Train:
 
                 global_step += 1
 
-            # Run validation
-            Train.run_validation(model, val_dataloader, tokenizer_src, tokenizer_tgt, config['seq_len'], device, lambda msg: print(msg), global_step, writer)
-            writer.add_scalar('train epoch', epoch, global_step)
-            writer.flush()
+            # # Run validation
+            # Train.run_validation(model, val_dataloader, tokenizer_src, tokenizer_tgt, config['seq_len'], device, lambda msg: print(msg), global_step, writer)
+            # writer.add_scalar('train epoch', epoch, global_step)
+            # writer.flush()
 
-            if epoch % config['save_interval'] == 0:
-                torch.save({'epoch': epoch, 'model_state_dict': model.state_dict(), 'optimizer_state_dict': optimizer.state_dict(), 'global_step': global_step}, 
-                           Config.get_weights_file_path(config, epoch))
+            # if epoch % config['save_interval'] == 0:
+            #     torch.save({'epoch': epoch, 'model_state_dict': model.state_dict(), 'optimizer_state_dict': optimizer.state_dict(), 'global_step': global_step}, 
+            #                Config.get_weights_file_path(config, epoch))
+            
+            # Run validation at the end of every epoch
+            Train.run_validation(model, val_dataloader, tokenizer_src, tokenizer_tgt, config['seq_len'], device, lambda msg: batch_iterator.write(msg), global_step, writer)
+
+            # Save the model at the end of every epoch
+            model_filename = Config.get_weights_file_path(config, f"{epoch:02d}")
+            torch.save({
+                'epoch': epoch,
+                'model_state_dict': model.state_dict(),
+                'optimizer_state_dict': optimizer.state_dict(),
+                'global_step': global_step
+            }, model_filename)
 
 # Example of usage
 if __name__ == '__main__':
