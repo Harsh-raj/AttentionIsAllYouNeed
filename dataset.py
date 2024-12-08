@@ -18,6 +18,19 @@ class BilingualDataset(Dataset):
     self.eos_token = torch.tensor([tokenizer_tgt.token_to_id("[EOS]")], dtype=torch.int64)
     self.pad_token = torch.tensor([tokenizer_tgt.token_to_id("[PAD]")], dtype=torch.int64)
 
+    # Filter dataset to exclude sentences that are too long
+        self.filtered_ds = [
+            pair for pair in self.ds
+            if self.is_valid_length(pair['translation'][self.src_lang], pair['translation'][self.tgt_lang])
+        ]
+        print(f"Dataset filtered: {len(self.ds)} -> {len(self.filtered_ds)} valid examples")
+
+  def is_valid_length(self, src_text, tgt_text):
+        # Check if the sentence lengths (after adding special tokens) fit within seq_len
+        src_len = len(self.tokenizer_src.encode(src_text).ids)
+        tgt_len = len(self.tokenizer_tgt.encode(tgt_text).ids)
+        return src_len + 2 <= self.seq_len and tgt_len + 1 <= self.seq_len
+
   def __len__(self):
     return len(self.ds)
 

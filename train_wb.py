@@ -268,7 +268,7 @@ class TrainWB:
 if __name__ == '__main__':
     warnings.filterwarnings("ignore")
     config = get_config()
-    config['num_epochs'] = 30
+    config['num_epochs'] = 10
     config['preload'] = None
 
     wandb.init(
