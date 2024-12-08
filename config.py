@@ -7,7 +7,7 @@ class Config:
         "batch_size": 8,
         "num_epochs": 10,
         "lr": 10**-4,
-        "seq_len": 300
+        "seq_len": 200
         "d_model": 512,
         "datasource": 'opus_books',
         "lang_src": "en",
