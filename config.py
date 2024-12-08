@@ -5,13 +5,13 @@ class Config:
   def get_config():
     return {
         "batch_size": 1,
-        "num_epochs": 10,
+        "num_epochs": 1,
         "lr": 10**-4,
         "seq_len": 128,
         "d_model": 512,
         "datasource": 'opus_books',
         "lang_src": "en",
-        "lang_tgt": "pt",
+        "lang_tgt": "es",
         "model_folder": "weights",
         "model_basename": "tmodel_",
         "preload": "latest",
