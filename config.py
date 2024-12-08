@@ -4,10 +4,10 @@ class Config:
   @staticmethod
   def get_config():
     return {
-        "batch_size": 4,
+        "batch_size": 8,
         "num_epochs": 10,
         "lr": 10**-4,
-        "seq_len": 512, #350
+        "seq_len": 350
         "d_model": 512,
         "datasource": 'opus_books',
         "lang_src": "en",
