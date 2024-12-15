@@ -240,7 +240,7 @@ class TrainWB:
             optimizer.zero_grad()
 
             # Forward pass with autocast for mixed precision
-            with torch.cuda.amp.autocast():
+            with torch.cuda.amp.autocast(enabled=(device == 'cuda')):
                 encoder_output = model.encode(encoder_input, encoder_mask)
                 decoder_output = model.decode(encoder_output, encoder_mask, decoder_input, decoder_mask)
                 proj_output = model.project(decoder_output)
@@ -280,10 +280,11 @@ class TrainWB:
 
 
 if __name__ == '__main__':
-    warnings.filterwarnings("ignore")
-    config = Config.get_config()
-    config['num_epochs'] = 10
-    config['preload'] = None
+    # warnings.filterwarnings("ignore")
+    # config = Config.get_config()
+    # config['num_epochs'] = 10
+    # config['preload'] = None
+    config = Config.load('config.yaml')
 
     wandb.init(
         # set the wandb project where this run will be logged
