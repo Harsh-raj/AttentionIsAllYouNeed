@@ -1,5 +1,5 @@
 from model import BuildTransformer
-from dataset import BilingualDataset, causal_mask
+from dataset import BilingualDataset
 from config import get_config, get_weights_file_path
 
 import torchtext.datasets as datasets
@@ -40,7 +40,7 @@ class TrainWB:
               break
 
           # build mask for target
-          decoder_mask = causal_mask(decoder_input.size(1)).type_as(source_mask).to(device)
+          decoder_mask = BilingualDataset.causal_mask(decoder_input.size(1)).type_as(source_mask).to(device)
 
           # calculate output
           out = model.decode(encoder_output, source_mask, decoder_input, decoder_mask)
