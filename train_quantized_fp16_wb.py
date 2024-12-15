@@ -1,6 +1,6 @@
 from model import BuildTransformer
 from dataset import BilingualDataset
-from config import get_config, get_weights_file_path
+from config import Config
 
 import torchtext.datasets as datasets
 import torch
@@ -203,7 +203,7 @@ class TrainWB:
     initial_epoch = 0
     global_step = 0
     if config['preload']:
-        model_filename = get_weights_file_path(config, config['preload'])
+        model_filename = Config.get_weights_file_path(config, config['preload'])
         print(f'Preloading model {model_filename}')
         state = torch.load(model_filename)
         model.load_state_dict(state['model_state_dict'])
@@ -258,7 +258,7 @@ class TrainWB:
             )
 
         # Save the model at the end of every epoch
-        model_filename = get_weights_file_path(config, f"{epoch:02d}")
+        model_filename = Config.get_weights_file_path(config, f"{epoch:02d}")
         torch.save({
             'epoch': epoch,
             'model_state_dict': model.state_dict(),
@@ -269,7 +269,7 @@ class TrainWB:
 
 if __name__ == '__main__':
     warnings.filterwarnings("ignore")
-    config = get_config()
+    config = Config.get_config()
     config['num_epochs'] = 10
     config['preload'] = None
 
