@@ -215,6 +215,7 @@ class TrainWB:
     loss_fn = nn.CrossEntropyLoss(ignore_index=tokenizer_src.token_to_id('[PAD]'), label_smoothing=0.1).to(device)
 
     # Define custom metrics for WandB
+    wandb.init()
     wandb.define_metric("global_step")
     wandb.define_metric("validation/*", step_metric="global_step")
     wandb.define_metric("train/*", step_metric="global_step")
