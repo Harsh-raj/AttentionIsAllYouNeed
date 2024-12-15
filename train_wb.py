@@ -85,7 +85,7 @@ class TrainWB:
               assert encoder_input.size(
                   0) == 1, "Batch size must be 1 for validation"
 
-              model_out = greedy_decode(model, encoder_input, encoder_mask, tokenizer_src, tokenizer_tgt, max_len, device)
+              model_out = TrainWB.greedy_decode(model, encoder_input, encoder_mask, tokenizer_src, tokenizer_tgt, max_len, device)
 
               source_text = batch["src_text"][0]
               target_text = batch["tgt_text"][0]
@@ -135,7 +135,7 @@ class TrainWB:
           tokenizer = Tokenizer(WordLevel(unk_token="[UNK]"))
           tokenizer.pre_tokenizer = Whitespace()
           trainer = WordLevelTrainer(special_tokens=["[UNK]", "[PAD]", "[SOS]", "[EOS]"], min_frequency=2)
-          tokenizer.train_from_iterator(get_all_sentences(ds, lang), trainer=trainer)
+          tokenizer.train_from_iterator(TrainWB.get_all_sentences(ds, lang), trainer=trainer)
           tokenizer.save(str(tokenizer_path))
       else:
           tokenizer = Tokenizer.from_file(str(tokenizer_path))
@@ -147,8 +147,8 @@ class TrainWB:
       ds_raw = load_dataset('opus_books', f"{config['lang_src']}-{config['lang_tgt']}", split='train')
 
       # Build tokenizers
-      tokenizer_src = get_or_build_tokenizer(config, ds_raw, config['lang_src'])
-      tokenizer_tgt = get_or_build_tokenizer(config, ds_raw, config['lang_tgt'])
+      tokenizer_src = TrainWB.get_or_build_tokenizer(config, ds_raw, config['lang_src'])
+      tokenizer_tgt = TrainWB.get_or_build_tokenizer(config, ds_raw, config['lang_tgt'])
 
       # Keep 90% for training, 10% for validation
       train_ds_size = int(0.9 * len(ds_raw))
@@ -179,7 +179,7 @@ class TrainWB:
 
   @staticmethod
   def get_model(config, vocab_src_len, vocab_tgt_len):
-      model = build_transformer(vocab_src_len, vocab_tgt_len, config["seq_len"], config['seq_len'], d_model=config['d_model'])
+      model = BuildTransformer(vocab_src_len, vocab_tgt_len, config["seq_len"], config['seq_len'], d_model=config['d_model'])
       return model
 
   @staticmethod
@@ -191,8 +191,8 @@ class TrainWB:
       # Make sure the weights folder exists
       Path(config['model_folder']).mkdir(parents=True, exist_ok=True)
 
-      train_dataloader, val_dataloader, tokenizer_src, tokenizer_tgt = get_ds(config)
-      model = get_model(config, tokenizer_src.get_vocab_size(), tokenizer_tgt.get_vocab_size()).to(device)
+      train_dataloader, val_dataloader, tokenizer_src, tokenizer_tgt = TrainWB.get_ds(config)
+      model = TrainWB.get_model(config, tokenizer_src.get_vocab_size(), tokenizer_tgt.get_vocab_size()).to(device)
 
       optimizer = torch.optim.Adam(model.parameters(), lr=config['lr'], eps=1e-9)
 
@@ -253,7 +253,7 @@ class TrainWB:
               global_step += 1
 
           # Run validation at the end of every epoch
-          run_validation(model, val_dataloader, tokenizer_src, tokenizer_tgt, config['seq_len'], device, lambda msg: batch_iterator.write(msg), global_step)
+          TrainWB.run_validation(model, val_dataloader, tokenizer_src, tokenizer_tgt, config['seq_len'], device, lambda msg: batch_iterator.write(msg), global_step)
 
           # Save the model at the end of every epoch
           model_filename = get_weights_file_path(config, f"{epoch:02d}")
@@ -279,4 +279,4 @@ if __name__ == '__main__':
         config=config
     )
     
-    train_model(config)
+    TrainWB.train_model(config)
