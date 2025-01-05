@@ -182,9 +182,9 @@ class TrainWB:
       ds_filtered = TrainWB.remove_sentences_by_token_length(ds_raw, tokenizer_src, tokenizer_tgt, config['lang_src'], config['lang_tgt'], 99)
 
       # Keep 90% for training, 10% for validation
-      train_ds_size = int(0.9 * len(ds_raw))
-      val_ds_size = len(ds_raw) - train_ds_size
-      train_ds_raw, val_ds_raw = random_split(ds_raw, [train_ds_size, val_ds_size])
+      train_ds_size = int(0.9 * len(ds_filtered))
+      val_ds_size = len(ds_filtered) - train_ds_size
+      train_ds_raw, val_ds_raw = random_split(ds_filtered, [train_ds_size, val_ds_size])
 
       train_ds = BilingualDataset(train_ds_raw, tokenizer_src, tokenizer_tgt, config['lang_src'], config['lang_tgt'], config['seq_len'])
       val_ds = BilingualDataset(val_ds_raw, tokenizer_src, tokenizer_tgt, config['lang_src'], config['lang_tgt'], config['seq_len'])
