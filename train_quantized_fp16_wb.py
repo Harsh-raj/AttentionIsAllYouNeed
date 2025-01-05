@@ -14,6 +14,7 @@ import os
 from pathlib import Path
 
 # Huggingface datasets and tokenizers
+import numpy as np
 from datasets import load_dataset
 from tokenizers import Tokenizer
 from tokenizers.models import WordLevel
@@ -142,6 +143,33 @@ class TrainWB:
       return tokenizer
   
   @staticmethod
+  def remove_sentences_by_token_length(dataset, tokenizer_src, tokenizer_tgt, lang_src, lang_tgt, threshold_percent):
+        # Step 1: Calculate token lengths for all sentence pairs
+        token_lengths_src = []
+        token_lengths_tgt = []
+
+        for item in dataset:
+            src_ids = tokenizer_src.encode(item['translation'][lang_src]).ids
+            tgt_ids = tokenizer_tgt.encode(item['translation'][lang_tgt]).ids
+            token_lengths_src.append(len(src_ids))
+            token_lengths_tgt.append(len(tgt_ids))
+
+        # Step 2: Calculate the percentile threshold based on the specified percentage
+        threshold_src = np.percentile(token_lengths_src, threshold_percent)
+        threshold_tgt = np.percentile(token_lengths_tgt, threshold_percent)
+
+        print(f"Token length threshold for source language ({lang_src}) at {threshold_percent}%: {threshold_src}")
+        print(f"Token length threshold for target language ({lang_tgt}) at {threshold_percent}%: {threshold_tgt}")
+
+        # Step 3: Filter out the sentence pairs whose token lengths exceed the threshold
+        filtered_dataset = []
+        for item, src_len, tgt_len in zip(dataset, token_lengths_src, token_lengths_tgt):
+            if src_len <= threshold_src and tgt_len <= threshold_tgt:
+                filtered_dataset.append(item)
+
+        return filtered_dataset
+  
+  @staticmethod
   def get_ds(config):
       # It only has the train split, so we divide it overselves
       ds_raw = load_dataset('opus_books', f"{config['lang_src']}-{config['lang_tgt']}", split='train')
@@ -149,6 +177,9 @@ class TrainWB:
       # Build tokenizers
       tokenizer_src = TrainWB.get_or_build_tokenizer(config, ds_raw, config['lang_src'])
       tokenizer_tgt = TrainWB.get_or_build_tokenizer(config, ds_raw, config['lang_tgt'])
+      
+      #Remove sentences that exceed the threshold token length
+      ds_filtered = TrainWB.remove_sentences_by_token_length(ds_raw, tokenizer_src, tokenizer_tgt, config['lang_src'], config['lang_tgt'], 99)
 
       # Keep 90% for training, 10% for validation
       train_ds_size = int(0.9 * len(ds_raw))
