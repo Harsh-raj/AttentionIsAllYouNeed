@@ -14,14 +14,17 @@ class Transformer(nn.Module):
     self.projection_layer = projection_layer
     
   def encoder(self, src, src_mask):
+    # (batch, seq_len, d_model)
     src = self.source_embed(src)
     src = self.source_pos(src)
     return self.encoder(src, src_mask)
   
-  def decoder(self, encoder_output, source_mask, target, target_mask):
+  def decoder(self, encoder_output: torch.Tensor, source_mask: torch.Tensor, target: torch.Tensor, target_mask: torch.Tensor):
+    # (batch, seq_len, d_model)
     target = self.target_embed(target)
     target = self.target_pos(target)
     return self.decoder(target, encoder_output, source_mask, target_mask)
   
   def project(self, x):
+    # (batch, seq_len, vocab_size)
     return self.projection_layer(x)
